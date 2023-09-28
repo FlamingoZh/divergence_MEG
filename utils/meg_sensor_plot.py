@@ -1,3 +1,7 @@
+import os
+
+home=os.path.expanduser("~")
+
 def topoplot(
     mat,
     nrow=4,
@@ -35,7 +39,7 @@ def topoplot(
     import matplotlib.pyplot as plt
 
     # gets sensor locations
-    with open("/home/yuchen/Desktop/Sherlock_MEG/HP_data/meg/locations.txt", "r") as f:
+    with open(f"{home}/Desktop/Sherlock_MEG/HP_data/meg/locations.txt", "r") as f:
         locs = csv.reader(f, delimiter=",")
         loc306 = np.asarray(
             [[float(w1[0].split(" ")[1]), float(w1[0].split(" ")[2])] for w1 in locs]
@@ -109,7 +113,7 @@ def single_topoplot(
     import matplotlib.pyplot as plt
 
     # gets sensor locations
-    with open("/home/yuchen/Desktop/Sherlock_MEG/HP_data/meg/locations.txt", "r") as f:
+    with open(f"{home}/Desktop/Sherlock_MEG/HP_data/meg/locations.txt", "r") as f:
         locs = csv.reader(f, delimiter=",")
         loc306 = np.asarray(
             [[float(w1[0].split(" ")[1]), float(w1[0].split(" ")[2])] for w1 in locs]
