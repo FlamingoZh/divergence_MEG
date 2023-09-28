@@ -1,0 +1,12 @@
+**old
+**demo
+**.ipynb_checkpoints
+**__pycache__
+
+**.sh
+
+finetuned_models/
+figures/
+HP_data/
+interim_data/
+command.txt
