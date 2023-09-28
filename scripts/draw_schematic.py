@@ -38,7 +38,10 @@ warnings.filterwarnings("ignore")
 
 
 if __name__ == '__main__':
-    data=pickle.load(open("/home/yuchen/Desktop/Harry_divergence/interim_data/data_for_analysis/HP_chapter_1_base.pkl","rb"))
+
+    home=os.path.expanduser("~")
+
+    data=pickle.load(open(f"{home}/Desktop/Harry_divergence/interim_data/data_for_analysis/HP_chapter_1_base.pkl","rb"))
     
     fig, ax = plt.subplots(figsize=(10, 2))
     ax.axis('off')

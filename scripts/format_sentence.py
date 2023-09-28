@@ -142,55 +142,53 @@ def save_sents(divergent_sents: List[str], similar_sents: List[str], fname: str)
 	with open(fname, "wb") as f:
 		pickle.dump(data_dict, f)
 
+## Get most and least divergent words
+def sort_list(words,MSEs):
+	# agg_MSEs=np.array([np.mean(MSEs[max(0,i-4):i+1]) for i in range(len(MSEs))])
+	agg_MSEs=np.array([MSEs[i] for i in range(len(MSEs))])
+
+	idx=np.argsort(agg_MSEs)
+	return [(agg_MSEs[i],words[i],i) for i in idx][::-1]
 
 if __name__ == "__main__":
+
+	home=os.path.expanduser("~")
 
 	parser = argparse.ArgumentParser()
 	
 	parser.add_argument("--dataset", default="HP")
 	parser.add_argument("--sequence_length", type=int, default=100)
-	# parser.add_argument("--base_path", default="/home/yuchen/Desktop/Harry_divergence/interim_data/data_for_analysis/")
-	# parser.add_argument("--data_path")
 	
-	parser.add_argument("--save_path", default="/home/yuchen/Desktop/Harry_divergence/interim_data/divergent_sents/")
+	parser.add_argument("--save_path", default=f"{home}/Desktop/Harry_divergence/interim_data/divergent_sents/")
 
 	parser.add_argument("--dump", action="store_false", help="dump generated data (by default True)")
 
 	args = parser.parse_args()
 
+
 	print("Echo arguments:",args)
 
 	## Load data
-	data1=pickle.load(open(f"/home/yuchen/Desktop/Harry_divergence/interim_data/data_for_analysis/HP_chapter_1_base.pkl","rb"))
+	data1=pickle.load(open(f"{home}/Desktop/Harry_divergence/interim_data/data_for_analysis/HP_chapter_1_base.pkl","rb"))
 
 	words1=data1['text'][args.sequence_length:]
 	MSEs1=np.mean(data1['MSE_all_tw'][4:17],axis=0)
 
-	data2=pickle.load(open(f"/home/yuchen/Desktop/Harry_divergence/interim_data/data_for_analysis/HP_chapter_2_base.pkl","rb"))
+	data2=pickle.load(open(f"{home}/Desktop/Harry_divergence/interim_data/data_for_analysis/HP_chapter_2_base.pkl","rb"))
 
 	words2=data2['text'][args.sequence_length:]
 	MSEs2=np.mean(data2['MSE_all_tw'][4:17],axis=0)
 
-	# words=words1+words2
-	# MSEs=np.concatenate([MSEs1,MSEs2])
-	words=words1
-	MSEs=MSEs1
-	print(len(words),MSEs.shape)
-
-	## Get most and least divergent words
-	def sort_list(words,MSEs):
-		agg_MSEs=np.array([np.mean(MSEs[max(0,i-4):i+1]) for i in range(len(MSEs))])
-		# agg_MSEs=np.array([MSEs[i] for i in range(len(MSEs))])
-
-		idx=np.argsort(agg_MSEs)
-		return [(agg_MSEs[i],words[i],i) for i in idx][::-1]
+	words=words1+words2
+	MSEs=np.concatenate([MSEs1,MSEs2])
+	# words=words1
+	# MSEs=MSEs1
+	# print(len(words),MSEs.shape)
 	
 	words_sorted = sort_list(words,MSEs)
-	# words_sorted = sorted(zip(*[MSEs, words, list(range(len(words)))]), key=lambda x:x[0])
 	divergent_sents = get_divergent_word_info(words_sorted[:100], words)
 	similar_sents = get_divergent_word_info(words_sorted[-100:], words)
 
 	## Save data
-	# save_sents(divergent_sents, similar_sents, f"{args.save_path}divergent_sents_chapter_1_new.pkl")
 	save_sents(divergent_sents, similar_sents, f"{args.save_path}divergent_sents_chapter_1.pkl")
 

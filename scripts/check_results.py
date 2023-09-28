@@ -40,8 +40,9 @@ import pprint
 
 
 if __name__ == '__main__':
+	home=os.path.expanduser("~")
 
-	result=pickle.load(open("/home/yuchen/Desktop/Harry_divergence/interim_data/divergent_sents/hypotheses_both_chapters_arch.pkl","rb"))
+	result=pickle.load(open(f"{home}/Desktop/Harry_divergence/interim_data/divergent_sents/hypotheses_both_chapters.pkl","rb"))
 	hyps=list(result)
 	scores=[result[hyp]['diff_w_significance']['mu'] for hyp in hyps]
 	p_values=[result[hyp]['diff_w_significance']['p_value'] for hyp in hyps]

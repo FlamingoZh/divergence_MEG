@@ -58,12 +58,14 @@ def plot_stacked_bar_plot(p1,p2):
 
 if __name__ == '__main__':
 
+	home=os.path.expanduser("~")
+
 	parser = argparse.ArgumentParser()
 	
 	parser.add_argument("--dataset", default="HP")
 	parser.add_argument("--chapter", type=int, default=1)
 
-	parser.add_argument("--base_path", default="/home/yuchen/Desktop/Harry_divergence/interim_data/permutation/")
+	parser.add_argument("--base_path", default=f"{home}/Desktop/Harry_divergence/interim_data/permutation/")
 	parser.add_argument("--pvals_path")
 	parser.add_argument("--ft_model_info")
 

@@ -38,13 +38,14 @@ warnings.filterwarnings("ignore")
 
 
 if __name__ == '__main__':
+	home=os.path.expanduser("~")
 
 	parser = argparse.ArgumentParser()
 	
 	parser.add_argument("--dataset", default="HP")
 	parser.add_argument("--chapter", type=int, default=1)
 
-	parser.add_argument("--base_path", default="/home/yuchen/Desktop/Harry_divergence/interim_data/data_for_analysis/")
+	parser.add_argument("--base_path", default=f"{home}/Desktop/Harry_divergence/interim_data/data_for_analysis/")
 	parser.add_argument("--data_base_path")
 	parser.add_argument("--data_ft_path")
 	parser.add_argument("--ft_model_info")

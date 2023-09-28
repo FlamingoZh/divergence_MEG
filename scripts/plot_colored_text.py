@@ -66,16 +66,19 @@ def color_texts(texts,mses,offset,colors,write_path,filename):
 				f.write(f"<span style='color:{color};'>"+word+" </span>")
 
 if __name__ == '__main__':
+
+	home=os.path.expanduser("~")
+
 	parser = argparse.ArgumentParser()
 	
 	parser.add_argument("--dataset", default="HP")
 	parser.add_argument("--chapter", type=int, default=1)
 	parser.add_argument("--offset", type=int, default=100)
 
-	parser.add_argument("--base_path", default="/home/yuchen/Desktop/Harry_divergence/interim_data/data_for_analysis/")
+	parser.add_argument("--base_path", default=f"{home}/Desktop/Harry_divergence/interim_data/data_for_analysis/")
 	parser.add_argument("--data_path", default="HP_chapter_1_base.pkl")
 
-	parser.add_argument("--write_path", default="/home/yuchen/Desktop/Harry_divergence/interim_data/colored_text/")
+	parser.add_argument("--write_path", default=f"{home}/Desktop/Harry_divergence/interim_data/colored_text/")
 	parser.add_argument("--model_info", default="base")
 
 	args = parser.parse_args()

@@ -57,13 +57,14 @@ def plot_num_of_sig_channels(sig_channels_all_tw,figsize=(20,6),fontsize=16):
 	return fig
 
 if __name__ == '__main__':
+	home=os.path.expanduser("~")
 
 	parser = argparse.ArgumentParser()
 	
 	parser.add_argument("--dataset", default="HP")
 	parser.add_argument("--chapter", type=int, default=1)
 
-	parser.add_argument("--base_path", default="/home/yuchen/Desktop/Harry_divergence/interim_data/data_for_analysis/")
+	parser.add_argument("--base_path", default=f"{home}/Desktop/Harry_divergence/interim_data/data_for_analysis/")
 	parser.add_argument("--data_path", default="HP_chapter_1_base.pkl")
 	
 	parser.add_argument("--model_info")

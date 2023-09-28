@@ -38,11 +38,12 @@ warnings.filterwarnings("ignore")
 
 
 if __name__ == '__main__':
+	home=os.path.expanduser("~")
 
 	parser = argparse.ArgumentParser()
 	
 	parser.add_argument("--dataset", default="HP")
-	parser.add_argument("--base_data_path", default="/home/yuchen/Desktop/Harry_divergence/HP_data/")
+	parser.add_argument("--base_data_path", default=f"{home}/Desktop/Harry_divergence/HP_data/")
 	parser.add_argument("--chapter", type=int, default=1)
 	parser.add_argument("--meg_offset", type=int, default=0)
 
