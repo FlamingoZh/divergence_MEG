@@ -177,17 +177,17 @@ def do_ridge_regression_and_compute_correlation(features,brain_responses,n_split
 
 	all_cors=list()
 	all_pvalues=list()
-	for pred,actual in zip(y_test_pred.T,y_test.T):
-		cor,pvalue=pearsonr(pred,actual,alternative="greater")
+	for i,j in zip(y_test_pred.T,y_test.T):
+		cor,pvalue=pearsonr(i,j,alternative="greater")
 		all_cors.append(cor)
 		all_pvalues.append(pvalue)
 
-	# wts=np.mean(np.stack(wts,axis=0),axis=0)
+	wts=np.mean(np.stack(wts,axis=0),axis=0)
 
 	is_pvalue_sig=[1 if pvalue<p_thresh else 0 for pvalue in all_pvalues]
 	sig_channels=[i for i,p in enumerate(all_pvalues) if p<p_thresh]
 
-	return all_y_test, all_y_test_pred, all_cors, all_pvalues, is_pvalue_sig, sig_channels, wts
+	return wts,all_cors,all_pvalues,is_pvalue_sig,sig_channels
 
 
 def cosine_similarity(A,B):
