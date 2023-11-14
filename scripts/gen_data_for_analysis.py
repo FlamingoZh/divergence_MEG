@@ -76,20 +76,20 @@ if __name__ == '__main__':
 	for time in range(denoised_meg.shape[2]):
 		# if time>0:
 		# 	continue
-		wt,corrs,_,_,sig_channels=utils.do_ridge_regression_and_compute_correlation(all_embeddings,denoised_meg[:,:,time])
+		all_y_test, all_y_test_pred, all_cors, all_pvalues, is_pvalue_sig, sig_channels, wts = utils.do_ridge_regression_and_compute_correlation(all_embeddings,denoised_meg[:,:,time])
 		print(f"{time*25}-{(time+1)*25}ms: {len(sig_channels)}")
 
-		predicted_meg=all_embeddings.dot(wt)
+		# predicted_meg=all_embeddings.dot(wt)
 		
 		MSEs=list()
 		cos_sim=list()
-		for pred,actual in zip(predicted_meg,denoised_meg[:,:,time]):
+		for pred,actual in zip(all_y_test_pred,all_y_test):	# word-wise
 			MSEs.append(np.linalg.norm(pred[sig_channels]-actual[sig_channels], ord=2) ** 2)
-			cos_sim.append(utils.cosine_similarity(pred,actual))
+			cos_sim.append(utils.cosine_similarity(pred[sig_channels],actual[sig_channels]))
 		
-		all_tw_corrs.append(corrs)
-		all_tw_actual.append(denoised_meg[:,:,time])
-		all_tw_pred.append(predicted_meg)
+		all_tw_corrs.append(all_cors)
+		all_tw_actual.append(all_y_test)
+		all_tw_pred.append(all_y_test_pred)
 		all_tw_sig_channels.append(sig_channels)
 		all_tw_mse.append(MSEs)
 		all_tw_cos_sim.append(cos_sim)

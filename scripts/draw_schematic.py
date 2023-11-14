@@ -50,7 +50,7 @@ if __name__ == '__main__':
     
     fig, ax = plt.subplots(figsize=(10, 2))
     ax.axis('off')    
-    plt.plot(data['actual_all_tw'][0,0,50:100],color="#f4f1bb",linewidth=4)
+    plt.plot(data['actual_all_tw'][0,0,50:100],color="#f4d35e",linewidth=4)
     fig.savefig(f'../figures/demo_actual_MEG2.png', bbox_inches='tight')
     
     fig, ax = plt.subplots(figsize=(10, 2))
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     
     fig, ax = plt.subplots(figsize=(10, 2))
     ax.axis('off')    
-    plt.plot(data['pred_all_tw'][0,0,50:100],color="#f4f1bb",linewidth=4)
+    plt.plot(data['pred_all_tw'][0,0,50:100],color="#f4d35e",linewidth=4)
     fig.savefig(f'../figures/demo_pred_MEG2.png', bbox_inches='tight')
     
     fig, ax = plt.subplots(figsize=(10, 2))

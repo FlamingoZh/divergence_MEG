@@ -59,13 +59,16 @@ def compare_models(D,P1,P2,p1,p2):
 		ax[row,col].text(0.15,0.49,f"{np.round(len(sig_channels_ft)/D.shape[2]*100,1)}%",c="#EB455F")
 		ax[row,col].text(0.41,0.16,f"{np.round(len(sig_channels_base)/D.shape[2]*100,1)}%",c="#2B3467")
 		
-		ax[row,col].set_xlim(0.13,0.57)
-		ax[row,col].set_ylim(0.13,0.57)
+		# ax[row,col].set_xlim(0.13,0.57)
+		# ax[row,col].set_ylim(0.13,0.57)
+		# ax[row,col].set_xticks([0.2,0.3,0.4,0.5])
+		# ax[row,col].set_yticks([0.2,0.3,0.4,0.5])
+
+		ax[row,col].set_xlim(-0.05,0.47)
+		ax[row,col].set_ylim(-0.05,0.47)
+		ax[row,col].set_xticks([0.0,0.1,0.2,0.3,0.4])
+		ax[row,col].set_yticks([0.0,0.1,0.2,0.3,0.4])
 		
-		# ax[row,col].set_xlim(0.15,0.55)
-		# ax[row,col].set_ylim(0.15,0.55)
-		ax[row,col].set_xticks([0.2,0.3,0.4,0.5])
-		ax[row,col].set_yticks([0.2,0.3,0.4,0.5])
 		ax[row,col].set_aspect('equal')
 
 	fig.text(0.4,0,"Correlation on Base Model")
