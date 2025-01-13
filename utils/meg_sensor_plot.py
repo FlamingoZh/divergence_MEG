@@ -59,6 +59,7 @@ def topoplot(
                     axes=col,
                     cmap=cmap,
                     show=False,
+                    contours = 0,
                 )
             i += 1
     i = 0

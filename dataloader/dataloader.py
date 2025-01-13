@@ -28,7 +28,7 @@ class HP_dataset_denoised(torch.utils.data.Dataset):
 
 		self.texts, self.megs = self.load_data()
 
-	def load_words_and_megs(self):
+	def load_words_and_megs(self, do_zscore = True):
 		if self.args.chapter==1:
 			mat = sio.loadmat(self.args.base_data_path+"meg/A_HP_notDetrended_25ms.mat")
 			words = mat['labels']
@@ -42,6 +42,9 @@ class HP_dataset_denoised(torch.utils.data.Dataset):
 			
 			all_megs=np.load(self.args.base_data_path+"denoised_HP_chapter2.npy")
 			all_megs=np.swapaxes(all_megs,1,2)
+
+		if do_zscore:
+			all_megs = zscore(all_megs)
 
 		return all_texts, all_megs
 

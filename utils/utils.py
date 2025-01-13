@@ -67,45 +67,53 @@ def compute_brain_surprisal_according_to_polarity(brain_data,neg_sig_channels=No
 
 def load_tokenizer_and_model_from_transformers(name):
 	if name=="GPT-J":
-		from transformers import AutoTokenizer, GPTJModel
-		tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B",truncation_side="left",padding_side="left")
-		model = GPTJModel.from_pretrained("EleutherAI/gpt-j-6B")
-	elif name=="demo_GPT":
-		from transformers import AutoTokenizer, GPTJModel
-		tokenizer = AutoTokenizer.from_pretrained("hf-internal-testing/tiny-random-gptj",truncation_side="left",padding_side="left")
-		model = GPTJModel.from_pretrained("hf-internal-testing/tiny-random-gptj")
-	elif name=="GPT2":
-		from transformers import GPT2Tokenizer, GPT2Model
-		tokenizer = GPT2Tokenizer.from_pretrained("gpt2",truncation_side="left",padding_side="left")
-		model = GPT2Model.from_pretrained("gpt2")
-	elif name=="GPT2-xl":
-		from transformers import GPT2Tokenizer, GPT2Model
-		tokenizer = GPT2Tokenizer.from_pretrained("gpt2-xl",truncation_side="left",padding_side="left")
-		model = GPT2Model.from_pretrained("gpt2-xl")
-	elif name=="GPT-Neo":
-		from transformers import AutoTokenizer, GPTNeoModel
-		tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-2.7B",truncation_side="left",padding_side="left")
-		model = GPTNeoModel.from_pretrained("EleutherAI/gpt-neo-2.7B")
-	elif name=="GPT-J_LMHead":
 		from transformers import AutoTokenizer, GPTJForCausalLM
 		tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B",truncation_side="left",padding_side="left")
 		model = GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B",output_hidden_states=True)
-	elif name=="demo_GPT_LMHead":
+	elif name=="demo_GPT":
 		from transformers import AutoTokenizer, GPTJForCausalLM
 		tokenizer = AutoTokenizer.from_pretrained("hf-internal-testing/tiny-random-gptj",truncation_side="left",padding_side="left")
 		model = GPTJForCausalLM.from_pretrained("hf-internal-testing/tiny-random-gptj",output_hidden_states=True)	
-	elif name=="GPT2_LMHead":
+	elif name=="GPT2":
 		from transformers import AutoTokenizer, GPT2LMHeadModel
 		tokenizer = AutoTokenizer.from_pretrained("gpt2",truncation_side="left",padding_side="left")
 		model = GPT2LMHeadModel.from_pretrained("gpt2",output_hidden_states=True)
-	elif name=="GPT2-xl_LMHead":
+	elif name=="GPT2-xl":
 		from transformers import AutoTokenizer, GPT2LMHeadModel
 		tokenizer = AutoTokenizer.from_pretrained("gpt2-xl",truncation_side="left",padding_side="left")
 		model = GPT2LMHeadModel.from_pretrained("gpt2-xl",output_hidden_states=True)
-	elif name=="GPT-Neo_LMHead":
+	elif name=="GPT-Neo":
 		from transformers import AutoTokenizer, GPTNeoForCausalLM
 		tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-2.7B",truncation_side="left",padding_side="left")
 		model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-2.7B",output_hidden_states=True)	
+	elif name=="Llama-2":
+		from transformers import AutoTokenizer, LlamaForCausalLM
+		tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf",truncation_side="left",padding_side="left")
+		model = LlamaForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf",output_hidden_states=True)	
+	elif name=="GPT-J_bare":
+		from transformers import AutoTokenizer, GPTJModel
+		tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B",truncation_side="left",padding_side="left")
+		model = GPTJModel.from_pretrained("EleutherAI/gpt-j-6B")
+	elif name=="demo_GPT_bare":
+		from transformers import AutoTokenizer, GPTJModel
+		tokenizer = AutoTokenizer.from_pretrained("hf-internal-testing/tiny-random-gptj",truncation_side="left",padding_side="left")
+		model = GPTJModel.from_pretrained("hf-internal-testing/tiny-random-gptj")
+	elif name=="GPT2_bare":
+		from transformers import GPT2Tokenizer, GPT2Model
+		tokenizer = GPT2Tokenizer.from_pretrained("gpt2",truncation_side="left",padding_side="left")
+		model = GPT2Model.from_pretrained("gpt2")
+	elif name=="GPT2-xl_bare":
+		from transformers import GPT2Tokenizer, GPT2Model
+		tokenizer = GPT2Tokenizer.from_pretrained("gpt2-xl",truncation_side="left",padding_side="left")
+		model = GPT2Model.from_pretrained("gpt2-xl")
+	elif name=="GPT-Neo_bare":
+		from transformers import AutoTokenizer, GPTNeoModel
+		tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-2.7B",truncation_side="left",padding_side="left")
+		model = GPTNeoModel.from_pretrained("EleutherAI/gpt-neo-2.7B")
+	elif name=="Llama-2_bare":
+		from transformers import AutoTokenizer, LlamaModel
+		tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf",truncation_side="left",padding_side="left")
+		model = LlamaModel.from_pretrained("meta-llama/Llama-2-7b-hf")
 	else:
 		raise ValueError("Unknown model name.")
 	return tokenizer, model
@@ -137,6 +145,25 @@ def compute_surprisal(all_last_words,all_logits):
 def ceiling_division(n, d):
 	return -(n // -d)
 
+def delay_one(mat, d):
+    # delays a matrix by a delay d. Positive d ==> row t has row t-d
+    new_mat = np.zeros_like(mat)
+    if d > 0:
+        new_mat[d:] = mat[:-d]
+    elif d < 0:
+        new_mat[:d] = mat[-d:]
+    else:
+        new_mat = mat
+    return new_mat
+
+
+def delay_mat(mat, delays):
+    # delays a matrix by a set of delays d.
+    # a row t in the returned matrix has the concatenated:
+    # row(t-delays[0],t-delays[1]...t-delays[last] )
+    new_mat = np.concatenate([delay_one(mat, d) for d in delays], axis=-1)
+    return new_mat
+
 ###############################
 def Fisher_method(all_pvalues):
 	chi=list()
@@ -148,17 +175,15 @@ def Fisher_method(all_pvalues):
 		chi_pvalues.append(chi_p)
 	return np.array(chi),np.array(chi_pvalues)
 
-def do_ridge_regression_and_compute_correlation(features,brain_responses,n_splits=10,p_thresh=0.001):
+def do_ridge_regression(features,brain_responses,n_splits=10):
 	kf = KFold(n_splits=n_splits)
 
-	wts=list()
-	all_y_test=list()
-	all_y_test_pred=list()
+	brain_responses_pred=np.zeros(brain_responses.shape)
 	for train, test in kf.split(features):
 		X_train, X_test, y_train, y_test = features[train], features[test], brain_responses[train], brain_responses[test]
 
-		alphas = np.logspace(-1, 3, 10) # Equally log-spaced alphas between 10 and 1000. The third number is the number of alphas to test.
-		nboots = 5 # Number of cross-validation runs.
+		alphas = np.logspace(-1, 2, 2) # Equally log-spaced alphas between the first number and the second number. The third number is the number of alphas to test.
+		nboots = 1 # Number of cross-validation runs.
 		chunklen = 40 # 
 		nchunks = 20
 
@@ -166,29 +191,12 @@ def do_ridge_regression_and_compute_correlation(features,brain_responses,n_split
 															alphas, nboots, chunklen, nchunks,
 															singcutoff=1e-10, single_alpha=True)
 		y_test_pred = np.dot(X_test, wt)
-		
-		all_y_test.append(y_test)
-		all_y_test_pred.append(y_test_pred)
 
-		wts.append(wt)
+		# fill prediction in the correct position
+		for i,word_idx in enumerate(test):
+			brain_responses_pred[word_idx] = y_test_pred[i]
 
-	all_y_test=np.vstack(all_y_test)
-	all_y_test_pred=np.vstack(all_y_test_pred)
-
-	all_cors=list()
-	all_pvalues=list()
-	for i,j in zip(y_test_pred.T,y_test.T):
-		cor,pvalue=pearsonr(i,j,alternative="greater")
-		all_cors.append(cor)
-		all_pvalues.append(pvalue)
-
-	wts=np.mean(np.stack(wts,axis=0),axis=0)
-
-	is_pvalue_sig=[1 if pvalue<p_thresh else 0 for pvalue in all_pvalues]
-	sig_channels=[i for i,p in enumerate(all_pvalues) if p<p_thresh]
-
-	return wts,all_cors,all_pvalues,is_pvalue_sig,sig_channels
-
+	return brain_responses_pred
 
 def cosine_similarity(A,B):
 	return np.dot(A,B)/(np.linalg.norm(A)*np.linalg.norm(B))
@@ -213,6 +221,8 @@ def FDR_correction(pvals):
 	pvals=np.array(pvals)
 	if len(pvals.shape)>1:
 		pvals_reshape=np.reshape(pvals,np.product(pvals.shape))
+	else:
+		pvals_reshape=pvals
 	pvals_corrected=smm.fdrcorrection(pvals_reshape)[1]
 	pvals_corrected=np.reshape(pvals_corrected,pvals.shape)
 	return pvals_corrected

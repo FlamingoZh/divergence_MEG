@@ -19,8 +19,6 @@ from sklearn.model_selection import KFold
 
 import statsmodels.api as sm
 
-# from mat4py import loadmat
-
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader, random_split
@@ -36,90 +34,16 @@ np.set_printoptions(precision=3,suppress=True)
 import warnings
 warnings.filterwarnings("ignore")
 
-from tqdm import tqdm
-from typing import List, Tuple
-
-def first_substr(lst: List[str], search_strings: List[str] = [".", "!", "?"]) -> int:
-	return next(i for i, x in enumerate(lst) if any(string in x for string in search_strings))
-
-def last_substr(lst: List[str], search_strings: List[str] = [".", "!", "?"]) -> int:
-	rev_lst = lst[::-1]
-	ind = first_substr(rev_lst, search_strings)
-	return len(lst) - ind - 1
-
-def get_divergent_word_info(words_sorted: List, words: List) -> Tuple[List[dict], List[str]]:
-	sentences = []
-	for div_word in tqdm(words_sorted):
-		_, word, word_ind = div_word
-
-		word_no_punct = "".join(c for c in word if c not in string.punctuation)
-
-		try:
-			forward_ind = first_substr(words[word_ind:])
-		except StopIteration:
-			forward_ind = 0
-		try:
-			backward_ind = last_substr(words[:word_ind])
-		except StopIteration:
-			backward_ind = -1
-		contain_sent = words[backward_ind + 1:word_ind + forward_ind + 1]
-		sentences.append(" ".join(contain_sent))
-
-	return sentences
-
-def save_sents(divergent_sents: List[str], similar_sents: List[str], fname: str) -> None:
-	# data_dict = {
-	# 	"generation": "",
-	# 	"example_hypotheses": [],
-	# 	"dataset_description": "sentences containing words that the brain found surprising (high MSE) or unsurprising (low MSE)",
-	# 	"target": "what types of sentences the brain tends to find more surprising",
-	# 	"user": "a literary analyst examining the language of a novel, given neuroimaging data on what the brain finds surprising",
-	# 	"A_desc": "sentences the brain found surprising",
-	# 	"B_desc": "sentences the brain found unsurprising",
-	# 	"split": {
-	# 		"research": {"A_samples": [], "B_samples": []},
-	# 		"validation": {"A_samples": [], "B_samples": []}
-	# 	}
-	# }
-
-	# data_dict = {
-	#     "generation": "",
-	#     "example_hypotheses": [],
-	#     "dataset_description": "sentences containing words that induce similar or divergent reactions in human cognitive processes and language models",
-	#     "target": "what type of sentences induce divergent reactions in human cognitive processes compared to language models",
-	#     "user": "A researcher conducting a comparative analysis of the divergent behaviors exhibited by human brains and language models.",
-	#     "A_desc": "sentences in which humans and language models exhibit divergent responses or interpretations.",
-	#     "B_desc": "sentences in which humans and language models exhibit similar responses or interpretations.",
-	#     "split": {
-	#         "research": {"A_samples": [], "B_samples": []},
-	#         "validation": {"A_samples": [], "B_samples": []}
-	#     }
-	# }
-
-
-	# data_dict = {
-	# 	"dataset_description": "sentences from Harry Potter and the Sorcerer's Stone",
-	# 	"generation": "whether humans and language models exhibit divergent or similar responses to those sentences",	    
-	# 	"target": "what type of sentences induce different reactions in human cognitive processes and language models",
-	# 	"user": "A researcher conducting a comparative analysis of the divergent behaviors exhibited by humans and language models.",
-	# 	"A_desc": "sentences in which humans and language models exhibit divergent responses or interpretations",
-	# 	"B_desc": "sentences in which humans and language models exhibit similar responses or interpretations",
-	# 	"example_hypotheses": ['contain figurative language', 'contain emotions', 'refer to physical objects'],
-	# 	"split": {
-	# 		"research": {"A_samples": [], "B_samples": []},
-	# 		"validation": {"A_samples": [], "B_samples": []}
-	# 	}
-	# }
+def save_sents(divergent_sents, similar_sents, fname):
 
 	data_dict = {
 		"dataset_description": "two chapters from 'Harry Potter and the Sorcerer's Stone'",
-		"generation": "the accuracy of language models in predicting human responses to these sentences",	    
-		"target": "which sentences pose difficulties for language models when predicting human responses",
-		"user": "a literary analyst investigating the characteristics of words that challenge language models in predicting human responses",
-		"A_desc": "sentences where language models poorly predict human responses",
-		"B_desc": "sentences where language models accurately predict human responses",
+		"generation": "the difference between language model and human responses to these sentences",	    
+		"target": "which sentences induce different responses for language models and human responses",
+		"user": "a literary analyst investigating the characteristics of words",
+		"A_desc": "sentences where language models and humans show divergent responses",
+		"B_desc": "sentences where language models and humans show similar responses",
 		"example_hypotheses": [],
-		# "example_hypotheses": ['contain figurative language', 'contain emotions', 'refer to physical objects'],
 		"split": {
 			"research": {"A_samples": [], "B_samples": []},
 			"validation": {"A_samples": [], "B_samples": []}
@@ -141,14 +65,25 @@ def save_sents(divergent_sents: List[str], similar_sents: List[str], fname: str)
 
 	with open(fname, "wb") as f:
 		pickle.dump(data_dict, f)
-
-## Get most and least divergent words
-def sort_list(words,MSEs):
-	# agg_MSEs=np.array([np.mean(MSEs[max(0,i-4):i+1]) for i in range(len(MSEs))])
-	agg_MSEs=np.array([MSEs[i] for i in range(len(MSEs))])
-
-	idx=np.argsort(agg_MSEs)
-	return [(agg_MSEs[i],words[i],i) for i in idx][::-1]
+	
+	
+def rank_sentences(words, mses, search_strings = [".", "!", "?"]):
+	all_sentences = list()
+	this_sentence = list()
+	mse_all_sentences = list()
+	mse_count = 0
+	
+	for i, word in enumerate(words):
+		this_sentence.append(word)
+		mse_count += mses[i]
+		if any(string in word for string in search_strings) and len(this_sentence) > 3: # end of a sentence
+			all_sentences.append(" ".join(this_sentence))
+			mse_all_sentences.append(mse_count/len(this_sentence))
+			this_sentence = list()
+			mse_count = 0
+			
+	sort_idx = np.argsort(mse_all_sentences)
+	return [all_sentences[idx] for idx in sort_idx]
 
 if __name__ == "__main__":
 
@@ -157,11 +92,17 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	
 	parser.add_argument("--dataset", default="HP")
-	parser.add_argument("--sequence_length", type=int, default=100)
-	
-	parser.add_argument("--save_path", default=f"{home}/Desktop/Harry_divergence/interim_data/divergent_sents/")
+	parser.add_argument("--sequence_length", type=int, default=20)
 
-	parser.add_argument("--dump", action="store_false", help="dump generated data (by default True)")
+	parser.add_argument("--chapter", type=int, default=1)
+
+	parser.add_argument("--layer", type=int, default=-1)
+	
+	parser.add_argument("--save_path", default=f"{home}/Desktop/MEG_divergence/interim_data/divergent_sents/")
+
+	parser.add_argument("--lm_name", default= "GPT2-xl")
+
+	parser.add_argument("--n_sents", type=int, default=100)
 
 	args = parser.parse_args()
 
@@ -169,26 +110,29 @@ if __name__ == "__main__":
 	print("Echo arguments:",args)
 
 	## Load data
-	data1=pickle.load(open(f"{home}/Desktop/Harry_divergence/interim_data/data_for_analysis/HP_chapter_1_base.pkl","rb"))
-
-	words1=data1['text'][args.sequence_length:]
-	MSEs1=np.mean(data1['MSE_all_tw'][4:17],axis=0)
-
-	data2=pickle.load(open(f"{home}/Desktop/Harry_divergence/interim_data/data_for_analysis/HP_chapter_2_base.pkl","rb"))
-
-	words2=data2['text'][args.sequence_length:]
-	MSEs2=np.mean(data2['MSE_all_tw'][4:17],axis=0)
-
-	words=words1+words2
-	MSEs=np.concatenate([MSEs1,MSEs2])
-	# words=words1
-	# MSEs=MSEs1
-	# print(len(words),MSEs.shape)
+	if args.chapter==12:
+		data1=pickle.load(open(f"{home}/Desktop/MEG_divergence/interim_data/data_for_analysis/HP_chpt1_{args.lm_name}_base.pkl","rb"))
+		words1=data1['text'][args.sequence_length:]
+		MSEs1=np.mean(data1['MSE'][args.layer][12:17],axis=0)
+		data2=pickle.load(open(f"{home}/Desktop/MEG_divergence/interim_data/data_for_analysis/HP_chpt2_{args.lm_name}_base.pkl","rb"))
+		words2=data2['text'][args.sequence_length:]
+		MSEs2=np.mean(data2['MSE'][args.layer][12:17],axis=0)
+		words=words1+words2
+		MSEs=np.concatenate([MSEs1,MSEs2])
+	elif args.chapter==1:
+		data=pickle.load(open(f"{home}/Desktop/MEG_divergence/interim_data/data_for_analysis/HP_chpt1_{args.lm_name}_base.pkl","rb"))
+		words=data['text'][args.sequence_length:]
+		MSEs=np.mean(data['MSE'][args.layer][12:17],axis=0)
+	elif args.chapter==2:
+		data=pickle.load(open(f"{home}/Desktop/MEG_divergence/interim_data/data_for_analysis/HP_chpt2_{args.lm_name}_base.pkl","rb"))
+		words=data['text'][args.sequence_length:]
+		MSEs=np.mean(data['MSE'][args.layer][12:17],axis=0)
 	
-	words_sorted = sort_list(words,MSEs)
-	divergent_sents = get_divergent_word_info(words_sorted[:100], words)
-	similar_sents = get_divergent_word_info(words_sorted[-100:], words)
+	ranked_sentences = rank_sentences(words, MSEs)
+	similar_sents = ranked_sentences[:args.n_sents]
+	divergent_sents = ranked_sentences[-args.n_sents:]
+	print("similar sentences:", similar_sents[:5])
+	print("divergent sentences:", divergent_sents[-5:])
 
 	## Save data
-	save_sents(divergent_sents, similar_sents, f"{args.save_path}divergent_sents_chapter_1.pkl")
-
+	save_sents(divergent_sents, similar_sents, f"{args.save_path}formatted_sents_{args.lm_name}_layer{args.layer}_chpt{args.chapter}.pkl")
