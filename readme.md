@@ -19,7 +19,7 @@ git clone git@github.com:FlamingoZh/divergence_MEG.git
 
 ### Datasets
 
-The word stimuli and preprocessed MEG recordings used in our study — including the Harry Potter and Moth datasets — can be accessed [here]((https://cmu.box.com/s/2sg5rfvfc4cl4yu8w6la23eb8ncrnv61)) via Box.
+The word stimuli and preprocessed MEG recordings used in our study — including the Harry Potter and Moth datasets — can be accessed [here](https://cmu.box.com/s/2sg5rfvfc4cl4yu8w6la23eb8ncrnv61) via Box.
 
 ### LM Embeddings Generation
 
